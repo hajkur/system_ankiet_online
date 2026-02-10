@@ -1,0 +1,83 @@
+@model zad1.Models.ViewModels.SurveyViewModel
+@{
+    ViewData["Title"] = "Create Survey";
+}
+
+<h1>Create New Survey</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create" id="surveyForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Options</label>
+                <div id="optionsContainer">
+                    @for (int i = 0; i < Model.OptionTexts.Count; i++)
+                    {
+                        <div class="input-group mb-2 option-item">
+                            <input asp-for="OptionTexts[i]" class="form-control" placeholder="Option text" />
+                            @if (i >= 2)
+                            {
+                                <button type="button" class="btn btn-danger remove-option">Remove</button>
+                            }
+                        </div>
+                    }
+                </div>
+                <span asp-validation-for="OptionTexts" class="text-danger"></span>
+                <button type="button" class="btn btn-secondary mt-2" id="addOption">Add Option</button>
+            </div>
+            
+            <div class="mb-3">
+                <input type="submit" value="Create Survey" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const optionsContainer = document.getElementById('optionsContainer');
+            const addOptionBtn = document.getElementById('addOption');
+            let optionIndex = @Model.OptionTexts.Count;
+
+            addOptionBtn.addEventListener('click', function() {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'input-group mb-2 option-item';
+                optionDiv.innerHTML = `
+                    <input name="OptionTexts" class="form-control" placeholder="Option text" />
+                    <button type="button" class="btn btn-danger remove-option">Remove</button>
+                `;
+                optionsContainer.appendChild(optionDiv);
+                optionIndex++;
+            });
+
+            optionsContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-option')) {
+                    const optionItems = optionsContainer.querySelectorAll('.option-item');
+                    if (optionItems.length > 2) {
+                        e.target.closest('.option-item').remove();
+                    } else {
+                        alert('At least 2 options are required.');
+                    }
+                }
+            });
+        });
+    </script>
+}

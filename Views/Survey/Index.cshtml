@@ -1,0 +1,56 @@
+@model IEnumerable<zad1.Models.Survey>
+@{
+    ViewData["Title"] = "Surveys";
+}
+
+<h1>Available Surveys</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (User.Identity?.IsAuthenticated == true && User.IsInRole("Ankieter"))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Create New Survey</a>
+    </p>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <p>No surveys available yet. @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Ankieter"))
+        {
+            <a asp-action="Create">Create one now!</a>
+        }</p>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var survey in Model)
+        {
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@survey.Title</h5>
+                        @if (!string.IsNullOrEmpty(survey.Description))
+                        {
+                            <p class="card-text">@survey.Description</p>
+                        }
+                        <p class="text-muted small">Created: @survey.CreatedAt.ToString("MMM dd, yyyy")</p>
+                        <a asp-action="Details" asp-route-id="@survey.Id" class="btn btn-primary">View Survey</a>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <a asp-action="Results" asp-route-id="@survey.Id" class="btn btn-secondary">View Results</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

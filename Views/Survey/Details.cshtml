@@ -1,0 +1,74 @@
+@model zad1.Models.ViewModels.SurveyDetailsViewModel
+@{
+    ViewData["Title"] = "Survey Details";
+}
+
+<h1>@Model.Title</h1>
+
+@if (!string.IsNullOrEmpty(Model.Description))
+{
+    <p class="lead">@Model.Description</p>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (Model.HasVoted || Model.IsCreator)
+{
+    <div class="alert alert-info">
+        @if (Model.HasVoted)
+        {
+            <p>You have already voted in this survey.</p>
+        }
+        else if (Model.IsCreator)
+        {
+            <p>You created this survey.</p>
+        }
+        <a asp-action="Results" asp-route-id="@Model.Id" class="btn btn-primary">View Results</a>
+    </div>
+}
+else if (Model.CanVote)
+{
+    <form asp-controller="Vote" asp-action="Vote" method="post" id="voteForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="surveyId" value="@Model.Id" />
+        
+        <h3>Select your answer:</h3>
+        <div class="mb-3">
+            @foreach (var option in Model.Options)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="optionId" id="option@option.Id" value="@option.Id" required>
+                    <label class="form-check-label" for="option@option.Id">
+                        @option.Text
+                    </label>
+                </div>
+            }
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Submit Vote</button>
+    </form>
+}
+else
+{
+    <div class="alert alert-warning">
+        <p>Please <a asp-controller="Account" asp-action="Login">login</a> to vote in this survey.</p>
+    </div>
+}
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">Back to Surveys</a>
+</div>
