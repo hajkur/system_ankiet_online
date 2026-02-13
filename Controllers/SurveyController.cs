@@ -43,11 +43,11 @@ public class SurveyController : Controller
             return NotFound();
         }
 
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var userName = User.Identity?.Name;
+        var userId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userName = User?.Identity?.Name;
         var hasVoted = false;
-        var canVote = User.Identity?.IsAuthenticated == true;
-        var isCreator = User.Identity?.IsAuthenticated == true && 
+        var canVote = User?.Identity?.IsAuthenticated == true;
+        var isCreator = User?.Identity?.IsAuthenticated == true &&
                        survey.CreatedBy == userName;
 
         if (userId != null)
